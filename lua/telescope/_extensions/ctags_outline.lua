@@ -12,7 +12,8 @@ local ft_opt_default = {
     aspvbs= "--asp-kinds=f",
     awk= "--awk-kinds=f",
     c= "--c-kinds=fp",
-    cpp= "--c++-kinds=fp --language-force=C++",
+    --cpp= "--c++-kinds=fp --language-force=C++",
+    cpp= "--c++-kinds=fp",
     cs= "--c#-kinds=m",
     erlang= "--erlang-kinds=f",
     fortran= "--fortran-kinds=f",
@@ -65,7 +66,8 @@ local function get_outline_entry(opts)
 
         local value = {}
         value.name, value.filename, value.line, value.type = string.match(entry, "(.-)\t(.-)\t(%d+).-\t(.*)")
-        --print(entry, name, path, line, type)
+        --print(entry)
+        --print(value.filename, value.line, value.type)
 
         value.lnum = tonumber(value.line)
         value.name = vim.fn.trim(vim.fn.getbufline(opts.bufnr, value.lnum)[1])
