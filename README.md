@@ -24,5 +24,6 @@ require('telescope').setup{
 
 require('telescope').extensions.ctags_outline.outline()
 
+require('telescope').load_extension('ctags_outline')
 :Telescope ctags_outline outline
 ```

@@ -12,8 +12,7 @@ local ft_opt_default = {
     aspvbs= "--asp-kinds=f",
     awk= "--awk-kinds=f",
     c= "--c-kinds=fp",
-    --cpp= "--c++-kinds=fp --language-force=C++",
-    cpp= "--c++-kinds=fp",
+    cpp= "--c++-kinds=fp --language-force=C++",
     cs= "--c#-kinds=m",
     erlang= "--erlang-kinds=f",
     fortran= "--fortran-kinds=f",
@@ -90,12 +89,15 @@ local function outline(opts)
     for _, v in ipairs(ctags) do
         table.insert(cmd, v)
     end
-    table.insert(cmd, "-n")
-    table.insert(cmd, "-u")
-    table.insert(cmd, "--fields=k")
-    table.insert(cmd, ft_opt[vim.fn.getbufvar(vim.fn.bufnr(), "&filetype")])
-    table.insert(cmd, "-f-")
+
+    local str = ("-n -u --fields=k %s -f-"):format(ft_opt[vim.fn.getbufvar(vim.fn.bufnr(), "&filetype")] or "")
+    for _, v in ipairs(vim.fn.split(str)) do
+        table.insert(cmd, v)
+    end
+
+    --maybe filename have space
     table.insert(cmd, vim.fn.expand("%:p"))
+
     --print(vim.inspect(cmd))
 
     opts.entry_maker = get_outline_entry(opts)
