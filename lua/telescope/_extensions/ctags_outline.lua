@@ -6,9 +6,7 @@ local action_state = require("telescope.actions.state")
 local entry_display = require("telescope.pickers.entry_display")
 
 local ctags = {}
-local ft_opt = {}
-
-local ft_opt_default = {
+local ft_opt = {
     aspvbs= "--asp-kinds=f",
     awk= "--awk-kinds=f",
     c= "--c-kinds=fp",
@@ -31,8 +29,6 @@ local ft_opt_default = {
     tcl= "--tcl-kinds=m",
     verilog= "--verilog-kinds=f",
     vim= "--vim-kinds=f",
-
-    --universal ctags
     go= "--go-kinds=f",
     rust= "--rust-kinds=fPM",
     ocaml= "--ocaml-kinds=mf",
@@ -75,7 +71,7 @@ local function get_outline_entry(opts)
             filename = value.filename,
             lnum = value.lnum,
             value = value,
-            ordinal = value.line .. value.name,
+            ordinal = value.line .. value.type .. value.name,
             display = make_display
         }
     end
@@ -122,7 +118,8 @@ end
 return require("telescope").register_extension {
     setup = function(ext_config)
         ctags = ext_config.ctags or {"ctags"}
-        ft_opt = ext_config.ft_opt or ft_opt_default
+        local set_ft_opt = ext_config.set_ft_opt or function() print("test") end
+        set_ft_opt(ft_opt)
     end,
     exports = { outline = outline },
 }
