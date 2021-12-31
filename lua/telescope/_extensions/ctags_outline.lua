@@ -5,35 +5,42 @@ local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local entry_display = require("telescope.pickers.entry_display")
 
-local ctags = {}
-local ft_opt = {}
-local ft_opt_default = {
-    aspvbs= "--asp-kinds=f",
-    awk= "--awk-kinds=f",
-    c= "--c-kinds=fp",
-    cpp= "--c++-kinds=fp --language-force=C++",
-    cs= "--c#-kinds=m",
-    erlang= "--erlang-kinds=f",
-    fortran= "--fortran-kinds=f",
-    java= "--java-kinds=m",
-    javascript= "--javascript-kinds=f",
-    lisp= "--lisp-kinds=f",
-    lua= "--lua-kinds=f",
-    matla= "--matlab-kinds=f",
-    pascal= "--pascal-kinds=f",
-    php= "--php-kinds=f",
-    python= "--python-kinds=fm --language-force=Python",
-    ruby= "--ruby-kinds=fF",
-    scheme= "--scheme-kinds=f",
-    sh= "--sh-kinds=f",
-    sql= "--sql-kinds=f",
-    tcl= "--tcl-kinds=m",
-    verilog= "--verilog-kinds=f",
-    vim= "--vim-kinds=f",
-    go= "--go-kinds=f",
-    rust= "--rust-kinds=fPM",
-    ocaml= "--ocaml-kinds=mf",
+local ctags_conf = {
+    ctags = { 'ctags' },
+    ft_opt = {
+        aspvbs= "--asp-kinds=f",
+        awk= "--awk-kinds=f",
+        c= "--c-kinds=fp",
+        cpp= "--c++-kinds=fp --language-force=C++",
+        cs= "--c#-kinds=m",
+        erlang= "--erlang-kinds=f",
+        fortran= "--fortran-kinds=f",
+        java= "--java-kinds=m",
+        javascript= "--javascript-kinds=f",
+        lisp= "--lisp-kinds=f",
+        lua= "--lua-kinds=f",
+        matla= "--matlab-kinds=f",
+        pascal= "--pascal-kinds=f",
+        php= "--php-kinds=f",
+        python= "--python-kinds=fm --language-force=Python",
+        ruby= "--ruby-kinds=fF",
+        scheme= "--scheme-kinds=f",
+        sh= "--sh-kinds=f",
+        sql= "--sql-kinds=f",
+        tcl= "--tcl-kinds=m",
+        verilog= "--verilog-kinds=f",
+        vim= "--vim-kinds=f",
+        go= "--go-kinds=f",
+        rust= "--rust-kinds=fPM",
+        ocaml= "--ocaml-kinds=mf",
+    },
 }
+
+local function ctags_setup(opts)
+
+    ctags_conf = vim.tbl_deep_extend("force", ctags_conf, opts)
+
+end
 
 local function get_outline_entry(opts)
     opts = opts or {}
@@ -83,11 +90,11 @@ local function outline(opts)
     local cmd = {}
 
     --init ctags options
-    for _, v in ipairs(ctags) do
+    for _, v in ipairs(ctags_conf.ctags) do
         table.insert(cmd, v)
     end
 
-    local str = ("-n -u --fields=k %s -f-"):format(ft_opt[vim.fn.getbufvar(vim.fn.bufnr(), "&filetype")] or "")
+    local str = ("-n -u --fields=k %s -f-"):format(ctags_conf.ft_opt[vim.fn.getbufvar(vim.fn.bufnr(), "&filetype")] or "")
     for _, v in ipairs(vim.fn.split(str)) do
         table.insert(cmd, v)
     end
@@ -116,15 +123,7 @@ local function outline(opts)
     }):find()
 end
 
-
 return require("telescope").register_extension {
-    setup = function(ext_config)
-        ctags = ext_config.ctags or {"ctags"}
-        if ext_config.ft_opt ~= nil
-        then
-            ft_opt = ft_opt_default
-            for k,v in pairs(ext_config.ft_opt) do ft_opt[k] = v end
-        end
-    end,
+    setup = ctags_setup,
     exports = { outline = outline },
 }
