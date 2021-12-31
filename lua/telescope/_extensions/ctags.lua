@@ -129,8 +129,10 @@ return telescope.register_extension {
 
        ctags_conf = ctags_default_conf
 
-       for _,v in pairs(ext_config.ctags) do print(v) end
-       ctags_conf.ctags = ext_config.ctags
+       if ext_config.ctags then
+           for _,v in pairs(ext_config.ctags) do print(v) end
+           ctags_conf.ctags = ext_config.ctags
+       end
 
         if ext_config.ft_opt then
             for k,v in pairs(ext_config.ft_opt) do ctags_conf.ft_opt[k] = v end
