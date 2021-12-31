@@ -1,3 +1,4 @@
+local has_telescope, telescope = pcall(require, 'telescope')
 local finders = require('telescope.finders')
 local pickers = require('telescope.pickers')
 local conf = require('telescope.config').values
@@ -5,7 +6,11 @@ local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 local entry_display = require('telescope.pickers.entry_display')
 
-local ctags_conf = {}
+if not has_telescope then
+  error('This plugins requires nvim-telescope/telescope.nvim')
+end
+
+local ctags_conf
 local ctags_default_conf = {
     ctags = { 'ctags' },
     ft_opt = {
@@ -119,17 +124,17 @@ local function outline(opts)
     }):find()
 end
 
-return require("telescope").register_extension {
-    setup = function(opts)
+return telescope.register_extension {
+    setup = function(ext_config)
 
         ctags_conf = ctags_default_conf
 
-        if opts.ctags then
-           ctags_conf.ctags = opts.ctags
+        if ext_config.ctags then
+           ctags_conf.ctags = ext_config.ctags
         end
 
-        if opts.ft_opt then
-            for k, v in pairs(opts.ft_opt) do ctags_conf.ft_opt[k] = v end
+        if ext_config.ft_opt then
+            for k,v in pairs(ext_config.ft_opt) do ctags_conf.ft_opt[k] = v end
         end
 
     end,
