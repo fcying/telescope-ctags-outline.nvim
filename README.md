@@ -46,14 +46,14 @@ require('telescope').setup{
     extensions = {
         ctags_outline = {
             --ctags option
-            ctags = {'ctags'}
+            ctags = {'ctags'},
             --ctags filetype option
-            set_ft_opt = function(ft_opt)
-                ft_opt.vim = '--vim-kinds=fk'
-                ft_opt.lua = '--lua-kinds=fk'
-            end
-        }
-    }
+            ft_opt = {
+                vim = '--vim-kinds=fk'
+                lua = '--lua-kinds=fk'
+            },
+        },
+    },
 }
 
 require('telescope').extensions.ctags_outline.outline()

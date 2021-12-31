@@ -6,7 +6,8 @@ local action_state = require("telescope.actions.state")
 local entry_display = require("telescope.pickers.entry_display")
 
 local ctags = {}
-local ft_opt = {
+local ft_opt = {}
+local ft_opt_default = {
     aspvbs= "--asp-kinds=f",
     awk= "--awk-kinds=f",
     c= "--c-kinds=fp",
@@ -115,11 +116,15 @@ local function outline(opts)
     }):find()
 end
 
+
 return require("telescope").register_extension {
     setup = function(ext_config)
         ctags = ext_config.ctags or {"ctags"}
-        local set_ft_opt = ext_config.set_ft_opt or function() print("test") end
-        set_ft_opt(ft_opt)
+        if ext_config.ft_opt ~= nil
+        then
+            ft_opt = ft_opt_default
+            for k,v in pairs(ext_config.ft_opt) do ft_opt[k] = v end
+        end
     end,
     exports = { outline = outline },
 }
