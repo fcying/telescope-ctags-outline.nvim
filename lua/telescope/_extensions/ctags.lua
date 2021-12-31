@@ -130,6 +130,7 @@ return telescope.register_extension {
         ctags_conf = ctags_default_conf
 
         if ext_config.ctags then
+           for _,v in pairs(ext_config.ctags) do print(v) end
            ctags_conf.ctags = ext_config.ctags
         end
 
