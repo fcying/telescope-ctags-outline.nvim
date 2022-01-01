@@ -1,6 +1,6 @@
 local has_telescope, telescope = pcall(require, 'telescope')
 if not has_telescope then
-  error('This plugins requires nvim-telescope/telescope.nvim')
+    error('telescope-ctags-outline.nvim requires nvim-telescope/telescope.nvim')
 end
 
 local finders = require('telescope.finders')
@@ -9,7 +9,6 @@ local conf = require('telescope.config').values
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 local entry_display = require('telescope.pickers.entry_display')
-
 
 local ctags_conf
 local ctags_default_conf = {
@@ -44,34 +43,35 @@ local ctags_default_conf = {
 }
 
 local ctags_setup = function(ext_config)
-
-       ctags_conf = ctags_default_conf
-       if ext_config.ctags then
-           ctags_conf.ctags = ext_config.ctags
-       end
-        if ext_config.ft_opt then
-            for k,v in pairs(ext_config.ft_opt) do ctags_conf.ft_opt[k] = v end
+    ctags_conf = ctags_default_conf
+    if ext_config.ctags then
+        ctags_conf.ctags = ext_config.ctags
+    end
+    if ext_config.ft_opt then
+        for k, v in pairs(ext_config.ft_opt) do
+            ctags_conf.ft_opt[k] = v
         end
+    end
 end
 
 local get_outline_entry = function(opts)
     opts = opts or {}
 
-    local displayer = entry_display.create {
+    local displayer = entry_display.create({
         separator = ' ',
         items = {
             { width = 4 },
             { remaining = true },
             { remaining = true },
         },
-    }
+    })
 
     local function make_display(entry)
-        return displayer {
+        return displayer({
             { entry.value.type, 'TelescopeResultsVariable' },
             { entry.value.name, 'TelescopeResultsFunction' },
             { '[' .. entry.value.line .. ']', 'TelescopeResultsComment' },
-        }
+        })
     end
 
     return function(entry)
@@ -80,7 +80,7 @@ local get_outline_entry = function(opts)
         end
 
         local value = {}
-        value.name, value.filename, value.line, value.type = string.match(entry, "(.-)\t(.-)\t(%d+).-\t(.*)")
+        value.name, value.filename, value.line, value.type = string.match(entry, '(.-)\t(.-)\t(%d+).-\t(.*)')
         --print(entry)
         --print(value.filename, value.line, value.type)
 
@@ -92,7 +92,7 @@ local get_outline_entry = function(opts)
             lnum = value.lnum,
             value = value,
             ordinal = value.line .. value.type .. value.name,
-            display = make_display
+            display = make_display,
         }
     end
 end
@@ -106,13 +106,15 @@ local outline = function(opts)
         table.insert(cmd, v)
     end
 
-    local str = ("-n -u --fields=k %s -f-"):format(ctags_conf.ft_opt[vim.fn.getbufvar(vim.fn.bufnr(), "&filetype")] or "")
+    local str = ('-n -u --fields=k %s -f-'):format(
+        ctags_conf.ft_opt[vim.fn.getbufvar(vim.fn.bufnr(), '&filetype')] or ''
+    )
     for _, v in ipairs(vim.fn.split(str)) do
         table.insert(cmd, v)
     end
 
     --maybe filename have space
-    table.insert(cmd, vim.fn.expand("%:p"))
+    table.insert(cmd, vim.fn.expand('%:p'))
 
     --print(vim.inspect(cmd))
 
