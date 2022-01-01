@@ -1,44 +1,64 @@
-local finders = require("telescope.finders")
-local pickers = require("telescope.pickers")
-local conf = require("telescope.config").values
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
-local entry_display = require("telescope.pickers.entry_display")
+local has_telescope, telescope = pcall(require, 'telescope')
+if not has_telescope then
+  error('This plugins requires nvim-telescope/telescope.nvim')
+end
 
-local ctags = {}
-local ft_opt = {
-    aspvbs= "--asp-kinds=f",
-    awk= "--awk-kinds=f",
-    c= "--c-kinds=fp",
-    cpp= "--c++-kinds=fp --language-force=C++",
-    cs= "--c#-kinds=m",
-    erlang= "--erlang-kinds=f",
-    fortran= "--fortran-kinds=f",
-    java= "--java-kinds=m",
-    javascript= "--javascript-kinds=f",
-    lisp= "--lisp-kinds=f",
-    lua= "--lua-kinds=f",
-    matla= "--matlab-kinds=f",
-    pascal= "--pascal-kinds=f",
-    php= "--php-kinds=f",
-    python= "--python-kinds=fm --language-force=Python",
-    ruby= "--ruby-kinds=fF",
-    scheme= "--scheme-kinds=f",
-    sh= "--sh-kinds=f",
-    sql= "--sql-kinds=f",
-    tcl= "--tcl-kinds=m",
-    verilog= "--verilog-kinds=f",
-    vim= "--vim-kinds=f",
-    go= "--go-kinds=f",
-    rust= "--rust-kinds=fPM",
-    ocaml= "--ocaml-kinds=mf",
+local finders = require('telescope.finders')
+local pickers = require('telescope.pickers')
+local conf = require('telescope.config').values
+local actions = require('telescope.actions')
+local action_state = require('telescope.actions.state')
+local entry_display = require('telescope.pickers.entry_display')
+
+
+local ctags_conf
+local ctags_default_conf = {
+    ctags = { 'ctags' },
+    ft_opt = {
+        aspvbs = '--asp-kinds=f',
+        awk = '--awk-kinds=f',
+        c = '--c-kinds=fp',
+        cpp = '--c++-kinds=fp --language-force=C++',
+        cs = '--c#-kinds=m',
+        erlang = '--erlang-kinds=f',
+        fortran = '--fortran-kinds=f',
+        java = '--java-kinds=m',
+        javascript = '--javascript-kinds=f',
+        lisp = '--lisp-kinds=f',
+        lua = '--lua-kinds=f',
+        matla = '--matlab-kinds=f',
+        pascal = '--pascal-kinds=f',
+        php = '--php-kinds=f',
+        python = '--python-kinds=fm --language-force=Python',
+        ruby = '--ruby-kinds=fF',
+        scheme = '--scheme-kinds=f',
+        sh = '--sh-kinds=f',
+        sql = '--sql-kinds=f',
+        tcl = '--tcl-kinds=m',
+        verilog = '--verilog-kinds=f',
+        vim = '--vim-kinds=f',
+        go = '--go-kinds=f',
+        rust = '--rust-kinds=fPM',
+        ocaml = '--ocaml-kinds=mf',
+    },
 }
 
-local function get_outline_entry(opts)
+local ctags_setup = function(ext_config)
+
+       ctags_conf = ctags_default_conf
+       if ext_config.ctags then
+           ctags_conf.ctags = ext_config.ctags
+       end
+        if ext_config.ft_opt then
+            for k,v in pairs(ext_config.ft_opt) do ctags_conf.ft_opt[k] = v end
+        end
+end
+
+local get_outline_entry = function(opts)
     opts = opts or {}
 
     local displayer = entry_display.create {
-        separator = " ",
+        separator = ' ',
         items = {
             { width = 4 },
             { remaining = true },
@@ -48,14 +68,14 @@ local function get_outline_entry(opts)
 
     local function make_display(entry)
         return displayer {
-            { entry.value.type, "TelescopeResultsVariable" },
-            { entry.value.name, "TelescopeResultsFunction" },
-            { "[" .. entry.value.line .. "]", "TelescopeResultsComment" },
+            { entry.value.type, 'TelescopeResultsVariable' },
+            { entry.value.name, 'TelescopeResultsFunction' },
+            { '[' .. entry.value.line .. ']', 'TelescopeResultsComment' },
         }
     end
 
     return function(entry)
-        if entry == "" then
+        if entry == '' then
             return nil
         end
 
@@ -77,16 +97,16 @@ local function get_outline_entry(opts)
     end
 end
 
-local function outline(opts)
+local outline = function(opts)
     opts = opts or {}
     local cmd = {}
 
     --init ctags options
-    for _, v in ipairs(ctags) do
+    for _, v in ipairs(ctags_conf.ctags) do
         table.insert(cmd, v)
     end
 
-    local str = ("-n -u --fields=k %s -f-"):format(ft_opt[vim.fn.getbufvar(vim.fn.bufnr(), "&filetype")] or "")
+    local str = ("-n -u --fields=k %s -f-"):format(ctags_conf.ft_opt[vim.fn.getbufvar(vim.fn.bufnr(), "&filetype")] or "")
     for _, v in ipairs(vim.fn.split(str)) do
         table.insert(cmd, v)
     end
@@ -100,7 +120,7 @@ local function outline(opts)
     opts.bufnr = vim.fn.bufnr()
 
     pickers.new(opts, {
-        prompt_title = "Ctags Outline",
+        prompt_title = 'Ctags Outline',
         finder = finders.new_oneshot_job(cmd, opts),
         sorter = conf.generic_sorter(opts),
         previewer = conf.grep_previewer(opts),
@@ -108,18 +128,14 @@ local function outline(opts)
             actions.select_default:replace(function()
                 actions.close(prompt_bufnr)
                 local selection = action_state.get_selected_entry()
-                vim.cmd("normal " .. selection.lnum .. "G^")
+                vim.cmd('normal ' .. selection.lnum .. 'G^')
             end)
             return true
         end,
     }):find()
 end
 
-return require("telescope").register_extension {
-    setup = function(ext_config)
-        ctags = ext_config.ctags or {"ctags"}
-        local set_ft_opt = ext_config.set_ft_opt or function() print("test") end
-        set_ft_opt(ft_opt)
-    end,
+return telescope.register_extension({
+    setup = ctags_setup,
     exports = { outline = outline },
-}
+})
