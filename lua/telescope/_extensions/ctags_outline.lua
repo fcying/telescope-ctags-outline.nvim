@@ -42,7 +42,7 @@ local ctags_default_conf = {
     },
 }
 
-local ctags_setup = function(ext_config)
+local function ctags_setup(ext_config)
     ctags_conf = ctags_default_conf
     if ext_config.ctags then
         ctags_conf.ctags = ext_config.ctags
@@ -54,13 +54,14 @@ local ctags_setup = function(ext_config)
     end
 end
 
-local get_outline_entry = function(opts)
+local function get_outline_entry(opts)
     opts = opts or {}
 
     local displayer = entry_display.create({
         separator = ' ',
         items = {
             { width = 4 },
+            { remaining = true },
             { remaining = true },
             { remaining = true },
         },
@@ -70,7 +71,8 @@ local get_outline_entry = function(opts)
         return displayer({
             { entry.value.type, 'TelescopeResultsVariable' },
             { entry.value.name, 'TelescopeResultsFunction' },
-            { '[' .. entry.value.line .. ']', 'TelescopeResultsComment' },
+            { '  [' .. entry.filename, 'TelescopeResultsComment' },
+            { ':' .. entry.value.line .. ']', 'TelescopeResultsComment' },
         })
     end
 
@@ -97,8 +99,8 @@ local get_outline_entry = function(opts)
     end
 end
 
-local outline = function(opts)
-    opts = opts or {}
+local function outline(opts)
+    opts = opts or { buf = 'cur' }
     local cmd = {}
 
     --init ctags options
@@ -114,7 +116,14 @@ local outline = function(opts)
     end
 
     --maybe filename have space
-    table.insert(cmd, vim.fn.expand('%:p'))
+    if opts.buf == 'all' then
+        local buffers = vim.fn.getbufinfo({ bufloaded = 1, buflisted = 1 })
+        for _, v in ipairs(buffers) do
+            table.insert(cmd, v.name)
+        end
+    else
+        table.insert(cmd, vim.fn.expand('%:p'))
+    end
 
     --print(vim.inspect(cmd))
 
