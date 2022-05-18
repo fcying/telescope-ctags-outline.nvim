@@ -57,23 +57,33 @@ end
 local function get_outline_entry(opts)
     opts = opts or {}
 
+    local display_items = {
+        { width = 4 },
+        { remaining = true },
+        { remaining = true },
+    }
+
+    if opts.buf == 'all' then
+        table.insert(display_items, { remaining = true })
+    end
+
     local displayer = entry_display.create({
         separator = ' ',
-        items = {
-            { width = 4 },
-            { remaining = true },
-            { remaining = true },
-            { remaining = true },
-        },
+        items = display_items,
     })
 
     local function make_display(entry)
-        return displayer({
+        local display_columns = {
             { entry.value.type, 'TelescopeResultsVariable' },
             { entry.value.name, 'TelescopeResultsFunction' },
-            { '  [' .. entry.filename, 'TelescopeResultsComment' },
-            { ':' .. entry.value.line .. ']', 'TelescopeResultsComment' },
-        })
+        }
+        if opts.buf == 'all' then
+            table.insert(display_columns, { '  [' .. entry.filename, 'TelescopeResultsComment' })
+            table.insert(display_columns, { ':' .. entry.value.line .. ']', 'TelescopeResultsComment' })
+        else
+            table.insert(display_columns, { '[' .. entry.value.line .. ']', 'TelescopeResultsComment' })
+        end
+        return displayer(display_columns)
     end
 
     return function(entry)
