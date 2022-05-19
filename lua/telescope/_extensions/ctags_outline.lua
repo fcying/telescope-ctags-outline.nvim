@@ -99,11 +99,16 @@ local function get_outline_entry(opts)
         value.lnum = tonumber(value.line)
         value.name = vim.fn.trim(vim.fn.getbufline(opts.bufnr, value.lnum)[1])
 
+        local ordinal = value.line .. value.type .. value.name
+        if opts.buf == 'all' then
+            ordinal = ordinal .. value.filename
+        end
+
         return {
             filename = value.filename,
             lnum = value.lnum,
             value = value,
-            ordinal = value.line .. value.type .. value.name,
+            ordinal = ordinal,
             display = make_display,
         }
     end
