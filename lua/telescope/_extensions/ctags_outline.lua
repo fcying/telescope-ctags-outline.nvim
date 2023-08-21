@@ -163,5 +163,5 @@ end
 
 return telescope.register_extension({
     setup = ctags_setup,
-    exports = { outline = outline },
+    exports = { ctags_outline = outline, outline = outline },
 })
