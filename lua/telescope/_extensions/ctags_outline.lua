@@ -42,18 +42,6 @@ local ctags_default_conf = {
     },
 }
 
-local function ctags_setup(ext_config)
-    ctags_conf = ctags_default_conf
-    if ext_config.ctags then
-        ctags_conf.ctags = ext_config.ctags
-    end
-    if ext_config.ft_opt then
-        for k, v in pairs(ext_config.ft_opt) do
-            ctags_conf.ft_opt[k] = v
-        end
-    end
-end
-
 local function get_outline_entry(opts)
     opts = opts or {}
 
@@ -140,28 +128,33 @@ local function outline(opts)
         table.insert(cmd, vim.fn.expand('%:p'))
     end
 
+    --print(vim.inspect(ctags_conf))
     --print(vim.inspect(cmd))
 
     opts.entry_maker = get_outline_entry(opts)
     opts.bufnr = vim.fn.bufnr()
 
-    pickers.new(opts, {
-        prompt_title = 'Ctags Outline',
-        finder = finders.new_oneshot_job(cmd, opts),
-        sorter = conf.generic_sorter(opts),
-        previewer = conf.grep_previewer(opts),
-        attach_mappings = function(prompt_bufnr)
-            actions.select_default:replace(function()
-                actions.close(prompt_bufnr)
-                local selection = action_state.get_selected_entry()
-                vim.cmd('normal ' .. selection.lnum .. 'G^')
-            end)
-            return true
-        end,
-    }):find()
+    pickers
+        .new(opts, {
+            prompt_title = 'Ctags Outline',
+            finder = finders.new_oneshot_job(cmd, opts),
+            sorter = conf.generic_sorter(opts),
+            previewer = conf.grep_previewer(opts),
+            attach_mappings = function(prompt_bufnr)
+                actions.select_default:replace(function()
+                    actions.close(prompt_bufnr)
+                    local selection = action_state.get_selected_entry()
+                    vim.cmd('normal ' .. selection.lnum .. 'G^')
+                end)
+                return true
+            end,
+        })
+        :find()
 end
 
 return telescope.register_extension({
-    setup = ctags_setup,
+    setup = function(ext_config)
+        ctags_conf = vim.tbl_deep_extend('force', ctags_default_conf, ext_config)
+    end,
     exports = { ctags_outline = outline, outline = outline },
 })
