@@ -38,6 +38,7 @@ ft_opt = {
     rust = '--rust-kinds=fPM',
     ocaml = '--ocaml-kinds=mf',
 },
+sorting_strategy = nil,
 ```
 
 
@@ -53,6 +54,7 @@ require('telescope').setup{
                 vim = '--vim-kinds=fk',
                 lua = '--lua-kinds=fk',
             },
+            sorting_strategy = 'ascending',
         },
     },
 }

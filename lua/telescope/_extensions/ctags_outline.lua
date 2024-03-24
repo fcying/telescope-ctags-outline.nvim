@@ -40,6 +40,7 @@ local ctags_default_conf = {
         rust = '--rust-kinds=fPM',
         ocaml = '--ocaml-kinds=mf',
     },
+    sorting_strategy = nil,
 }
 
 local function get_outline_entry(opts)
@@ -140,6 +141,7 @@ local function outline(opts)
             finder = finders.new_oneshot_job(cmd, opts),
             sorter = conf.generic_sorter(opts),
             previewer = conf.grep_previewer(opts),
+            sorting_strategy = ctags_conf.sorting_strategy,
             attach_mappings = function(prompt_bufnr)
                 actions.select_default:replace(function()
                     actions.close(prompt_bufnr)
