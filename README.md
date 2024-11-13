@@ -1,5 +1,6 @@
 # telescope-ctags-outline.nvim
-get ctags outline for [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
+get ctags outline for [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)  
+Use [exuberant-ctags](https://ctags.sourceforge.net) does not support all options, it is recommended to use [universal-ctags](https://github.com/universal-ctags/ctags).
 
 
 ### Installation
@@ -20,7 +21,6 @@ ft_opt = {
     erlang = '--erlang-kinds=f',
     fortran = '--fortran-kinds=f',
     java = '--java-kinds=m',
-    javascript = '--javascript-kinds=f',
     lisp = '--lisp-kinds=f',
     lua = '--lua-kinds=f',
     matla = '--matlab-kinds=f',
@@ -34,6 +34,8 @@ ft_opt = {
     tcl = '--tcl-kinds=m',
     verilog = '--verilog-kinds=f',
     vim = '--vim-kinds=f',
+    -- universal ctags
+    javascript = '--javascript-kinds=f',
     go = '--go-kinds=f',
     rust = '--rust-kinds=fPM',
     ocaml = '--ocaml-kinds=mf',

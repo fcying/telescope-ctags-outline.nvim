@@ -11,6 +11,8 @@ local action_state = require('telescope.actions.state')
 local entry_display = require('telescope.pickers.entry_display')
 
 local ctags_conf
+
+-- default value fork from https://github.com/Yggdroot/LeaderF/blob/master/autoload/leaderf/python/leaderf/functionExpl.py
 local ctags_default_conf = {
     ctags = { 'ctags' },
     ft_opt = {
@@ -22,7 +24,6 @@ local ctags_default_conf = {
         erlang = '--erlang-kinds=f',
         fortran = '--fortran-kinds=f',
         java = '--java-kinds=m',
-        javascript = '--javascript-kinds=f',
         lisp = '--lisp-kinds=f',
         lua = '--lua-kinds=f',
         matla = '--matlab-kinds=f',
@@ -36,6 +37,8 @@ local ctags_default_conf = {
         tcl = '--tcl-kinds=m',
         verilog = '--verilog-kinds=f',
         vim = '--vim-kinds=f',
+        -- universal ctags
+        javascript = '--javascript-kinds=f',
         go = '--go-kinds=f',
         rust = '--rust-kinds=fPM',
         ocaml = '--ocaml-kinds=mf',
