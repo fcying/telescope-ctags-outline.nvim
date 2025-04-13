@@ -70,4 +70,8 @@ require('telescope').extensions.ctags_outline.outline()
 -- show all opened buf outline(use current buf filetype)
 :Telescope ctags_outline buf=all
 require('telescope').extensions.ctags_outline.outline({buf='all'})
+
+-- snacks
+require("telescope-ctags-outline").setup()
+require("telescope-ctags-outline").snacks_ctags_outline()
 ```
