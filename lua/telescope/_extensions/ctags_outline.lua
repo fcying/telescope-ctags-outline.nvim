@@ -50,12 +50,20 @@ local function get_outline_entry(opts)
         end
 
         local value = {}
+        local bufnr
+
         value.name, value.filename, value.line, value.type = string.match(entry, "(.-)\t(.-)\t(%d+).-\t(.*)")
         -- vim.print(entry)
         -- vim.print(value.filename, value.line, value.type)
 
+        if opts.buf == "cur" then
+            bufnr = vim.fn.bufnr()
+        else
+            bufnr = vim.fn.bufnr(value.filename)
+        end
+
         value.lnum = tonumber(value.line)
-        value.name = vim.fn.trim(vim.fn.getbufline(opts.bufnr, value.lnum)[1])
+        value.name = vim.fn.trim(vim.fn.getbufline(bufnr, value.lnum)[1])
 
         local ordinal = value.line .. value.type .. value.name
         if opts.buf == "all" then
@@ -74,8 +82,8 @@ end
 
 local function outline(opts)
     opts = opts or { buf = "cur" }
-    local cmd = require("telescope-ctags-outline").get_cmd(opts)
-    local ctags_conf = require("telescope-ctags-outline").get_conf()
+    local cmd = require("ctags-outline").get_cmd(opts)
+    local ctags_conf = require("ctags-outline").get_conf()
 
     opts.entry_maker = get_outline_entry(opts)
     opts.bufnr = vim.fn.bufnr()
@@ -91,7 +99,9 @@ local function outline(opts)
                 actions.select_default:replace(function()
                     actions.close(prompt_bufnr)
                     local selection = action_state.get_selected_entry()
-                    vim.cmd("normal " .. selection.lnum .. "G^")
+                    local bufnr = vim.fn.bufnr(selection.filename)
+                    vim.api.nvim_set_current_buf(bufnr)
+                    vim.api.nvim_win_set_cursor(0, { selection.lnum, 0 })
                 end)
                 return true
             end,
@@ -101,7 +111,7 @@ end
 
 return telescope.register_extension({
     setup = function(ext_config)
-        require("telescope-ctags-outline").setup(ext_config)
+        require("ctags-outline").setup(ext_config)
     end,
     exports = { ctags_outline = outline, outline = outline },
 })

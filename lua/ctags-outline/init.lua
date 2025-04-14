@@ -73,9 +73,9 @@ end
 M.snacks_ctags_outline = function(opts)
     opts = opts or { buf = "cur" }
 
-    local outline = require("telescope-ctags-outline")
-    local output = vim.fn.systemlist(outline.get_cmd(opts))
+    local output = vim.fn.systemlist(M.get_cmd(opts))
     local items = {}
+    local bufnr
     for i, item in ipairs(output) do
         name, filename, line, tag = string.match(item, "(.-)\t(.-)\t(%d+).-\t(.*)")
 
@@ -98,16 +98,25 @@ M.snacks_ctags_outline = function(opts)
         end
     end
     return Snacks.picker({
+        title = "CtagsOutline",
         items = items,
         format = function(item)
             local ret = {}
             ret[#ret + 1] = { item.tag, "SnacksPickerLabel" }
             ret[#ret + 1] = { ("\t%s"):format(item.text), "SnacksPickerCmd" }
-            ret[#ret + 1] = { (" [%d]"):format(item.line), "SnacksPickerComment" }
+            if opts.buf == "all" then
+                ret[#ret + 1] = { (" [%s:%d]"):format(item.file, item.line), "SnacksPickerComment" }
+            else
+                ret[#ret + 1] = { (" [%d]"):format(item.line), "SnacksPickerComment" }
+            end
             return ret
         end,
         confirm = function(picker, item)
             picker:close()
+            if opts.buf == "all" then
+                bufnr = vim.fn.bufnr(item.file)
+                vim.api.nvim_set_current_buf(bufnr)
+            end
             vim.api.nvim_win_set_cursor(0, { item.line, 0 })
         end,
     })

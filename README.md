@@ -1,5 +1,6 @@
 # telescope-ctags-outline.nvim
-get ctags outline for [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)  
+get ctags outline for [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) and [snacks.nvim](https://github.com/folke/snacks.nvim)  
+  
 Use [exuberant-ctags](https://ctags.sourceforge.net) does not support all options, it is recommended to use [universal-ctags](https://github.com/universal-ctags/ctags).
 
 
@@ -46,18 +47,18 @@ sorting_strategy = nil,
 
 ### Usage
 ```
+local opts = {
+    ctags = { "ctags" },
+    ft_opt = {
+        vim = "--vim-kinds=fk",
+        lua = "--lua-kinds=fk",
+    },
+    sorting_strategy = "ascending",
+}
+
 require('telescope').setup{
     extensions = {
-        ctags_outline = {
-            --ctags option
-            ctags = {'ctags'},
-            --ctags filetype option
-            ft_opt = {
-                vim = '--vim-kinds=fk',
-                lua = '--lua-kinds=fk',
-            },
-            sorting_strategy = 'ascending',
-        },
+        ctags_outline = opts,
     },
 }
 
@@ -72,6 +73,7 @@ require('telescope').extensions.ctags_outline.outline()
 require('telescope').extensions.ctags_outline.outline({buf='all'})
 
 -- snacks
-require("telescope-ctags-outline").setup()
-require("telescope-ctags-outline").snacks_ctags_outline()
+require("ctags-outline").setup(opts)
+require("ctags-outline").snacks_ctags_outline()
+require("ctags-outline").snacks_ctags_outline({buf='all'})
 ```
