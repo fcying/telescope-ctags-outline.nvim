@@ -86,7 +86,6 @@ local function outline(opts)
     local ctags_conf = require("ctags-outline").get_conf()
 
     opts.entry_maker = get_outline_entry(opts)
-    opts.bufnr = vim.fn.bufnr()
 
     pickers
         .new(opts, {
@@ -99,9 +98,11 @@ local function outline(opts)
                 actions.select_default:replace(function()
                     actions.close(prompt_bufnr)
                     local selection = action_state.get_selected_entry()
-                    local bufnr = vim.fn.bufnr(selection.filename)
-                    vim.api.nvim_set_current_buf(bufnr)
-                    vim.api.nvim_win_set_cursor(0, { selection.lnum, 0 })
+                    if selection ~= nil then
+                        local bufnr = vim.fn.bufnr(selection.filename)
+                        vim.api.nvim_set_current_buf(bufnr)
+                        vim.api.nvim_win_set_cursor(0, { selection.lnum, 0 })
+                    end
                 end)
                 return true
             end,

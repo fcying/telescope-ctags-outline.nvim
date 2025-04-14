@@ -113,11 +113,13 @@ M.snacks_ctags_outline = function(opts)
         end,
         confirm = function(picker, item)
             picker:close()
-            if opts.buf == "all" then
-                bufnr = vim.fn.bufnr(item.file)
-                vim.api.nvim_set_current_buf(bufnr)
+            if item ~= nil then
+                if opts.buf == "all" then
+                    bufnr = vim.fn.bufnr(item.file)
+                    vim.api.nvim_set_current_buf(bufnr)
+                end
+                vim.api.nvim_win_set_cursor(0, { item.line, 0 })
             end
-            vim.api.nvim_win_set_cursor(0, { item.line, 0 })
         end,
     })
 end
