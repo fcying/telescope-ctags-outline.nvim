@@ -79,10 +79,9 @@ M.snacks_ctags_outline = function(opts)
     for i, item in ipairs(output) do
         name, filename, line, tag = string.match(item, "(.-)\t(.-)\t(%d+).-\t(.*)")
 
-        bufnr = vim.fn.bufnr(filename)
-        full_name = vim.fn.trim(vim.fn.getbufline(bufnr, line)[1])
-
-        if name and line then
+        if filename then
+            bufnr = vim.fn.bufnr(filename)
+            full_name = vim.fn.trim(vim.fn.getbufline(bufnr, line)[1])
             table.insert(items, {
                 idx = i,
                 score = i,
@@ -94,6 +93,7 @@ M.snacks_ctags_outline = function(opts)
             })
         end
     end
+
     return Snacks.picker({
         title = "CtagsOutline",
         items = items,

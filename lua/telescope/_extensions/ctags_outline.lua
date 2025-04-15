@@ -51,6 +51,10 @@ local function get_outline_entry(opts)
 
         value.name, value.filename, value.line, value.type = string.match(entry, "(.-)\t(.-)\t(%d+).-\t(.*)")
 
+        if value.filename == nil then
+            return nil
+        end
+
         value.bufnr = vim.fn.bufnr(value.filename)
         value.lnum = tonumber(value.line)
         value.name = vim.fn.trim(vim.fn.getbufline(value.bufnr, value.lnum)[1])
