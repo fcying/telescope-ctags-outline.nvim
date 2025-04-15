@@ -13,8 +13,6 @@ local entry_display = require("telescope.pickers.entry_display")
 
 
 local function get_outline_entry(opts)
-    opts = opts or {}
-
     local display_items = {
         { width = 4 },
         { remaining = true },
@@ -50,20 +48,15 @@ local function get_outline_entry(opts)
         end
 
         local value = {}
-        local bufnr
 
         value.name, value.filename, value.line, value.type = string.match(entry, "(.-)\t(.-)\t(%d+).-\t(.*)")
-        -- vim.print(entry)
-        -- vim.print(value.filename, value.line, value.type)
 
-        if opts.buf == "cur" then
-            bufnr = vim.fn.bufnr()
-        else
-            bufnr = vim.fn.bufnr(value.filename)
-        end
-
+        value.bufnr = vim.fn.bufnr(value.filename)
         value.lnum = tonumber(value.line)
-        value.name = vim.fn.trim(vim.fn.getbufline(bufnr, value.lnum)[1])
+        value.name = vim.fn.trim(vim.fn.getbufline(value.bufnr, value.lnum)[1])
+
+        -- vim.print(entry)
+        -- vim.print(value)
 
         local ordinal = value.line .. value.type .. value.name
         if opts.buf == "all" then
@@ -76,6 +69,7 @@ local function get_outline_entry(opts)
             value = value,
             ordinal = ordinal,
             display = make_display,
+            bufnr = value.bufnr,
         }
     end
 end
@@ -99,8 +93,7 @@ local function outline(opts)
                     actions.close(prompt_bufnr)
                     local selection = action_state.get_selected_entry()
                     if selection ~= nil then
-                        local bufnr = vim.fn.bufnr(selection.filename)
-                        vim.api.nvim_set_current_buf(bufnr)
+                        vim.api.nvim_set_current_buf(selection.bufnr)
                         vim.api.nvim_win_set_cursor(0, { selection.lnum, 0 })
                     end
                 end)

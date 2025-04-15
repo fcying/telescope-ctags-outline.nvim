@@ -79,11 +79,7 @@ M.snacks_ctags_outline = function(opts)
     for i, item in ipairs(output) do
         name, filename, line, tag = string.match(item, "(.-)\t(.-)\t(%d+).-\t(.*)")
 
-        if opts.buf == "cur" then
-            bufnr = vim.fn.bufnr()
-        else
-            bufnr = vim.fn.bufnr(filename)
-        end
+        bufnr = vim.fn.bufnr(filename)
         full_name = vim.fn.trim(vim.fn.getbufline(bufnr, line)[1])
 
         if name and line then
@@ -94,6 +90,7 @@ M.snacks_ctags_outline = function(opts)
                 file = filename,
                 line = tonumber(line),
                 tag = tag,
+                bufnr = bufnr,
             })
         end
     end
@@ -115,8 +112,7 @@ M.snacks_ctags_outline = function(opts)
             picker:close()
             if item ~= nil then
                 if opts.buf == "all" then
-                    bufnr = vim.fn.bufnr(item.file)
-                    vim.api.nvim_set_current_buf(bufnr)
+                    vim.api.nvim_set_current_buf(item.bufnr)
                 end
                 vim.api.nvim_win_set_cursor(0, { item.line, 0 })
             end
