@@ -90,6 +90,7 @@ M.snacks_ctags_outline = function(opts)
                 line = tonumber(line),
                 tag = tag,
                 bufnr = bufnr,
+                pos = { tonumber(line), 0 },
             })
         end
     end
@@ -97,6 +98,7 @@ M.snacks_ctags_outline = function(opts)
     return Snacks.picker({
         title = "CtagsOutline",
         items = items,
+        preview = "file",
         format = function(item)
             local ret = {}
             ret[#ret + 1] = { item.tag, "SnacksPickerLabel" }
